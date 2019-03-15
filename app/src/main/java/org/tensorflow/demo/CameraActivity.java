@@ -312,7 +312,7 @@ public abstract class CameraActivity extends Activity
     return requiredLevel <= deviceLevel;
   }
 
-  private String chooseCamera() {
+  private String chooseCameraBack() {
     final CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
     try {
       for (final String cameraId : manager.getCameraIdList()) {
@@ -347,6 +347,43 @@ public abstract class CameraActivity extends Activity
     return null;
   }
 
+  private String chooseCamera() {
+    final CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
+    try {
+      for (final String cameraId : manager.getCameraIdList()) {
+        final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
+
+        // We don't use a front facing camera in this sample.
+        final Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
+        if (facing != null && facing == CameraCharacteristics.LENS_FACING_BACK) {
+          continue;
+        }
+        if (facing != null && facing == CameraCharacteristics.LENS_FACING_EXTERNAL) {
+          continue;
+        }
+
+        final StreamConfigurationMap map =
+                characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
+
+        if (map == null) {
+          continue;
+        }
+
+        // Fallback to camera1 API for internal cameras that don't have full support.
+        // This should help with legacy situations where using the camera2 API causes
+        // distorted or otherwise broken previews.
+        useCamera2API = (facing == CameraCharacteristics.LENS_FACING_FRONT)
+                || isHardwareLevelSupported(characteristics,
+                CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL);
+        LOGGER.i("Camera API lv2?: %s", useCamera2API);
+        return cameraId;
+      }
+    } catch (CameraAccessException e) {
+      LOGGER.e(e, "Not allowed to access camera");
+    }
+
+    return null;
+  }
   protected void setFragment() {
     String cameraId = chooseCamera();
 

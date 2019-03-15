@@ -53,7 +53,6 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
   private static final boolean TF_OD_API_IS_QUANTIZED = true;
   private static final String TF_OD_API_MODEL_FILE = "detect.tflite";
   private static final String TF_OD_API_LABELS_FILE = "coco_labels_list.txt";
-
   // Which detection model to use: by default uses Tensorflow Object Detection API frozen
   // checkpoints.
   private enum DetectorMode {
@@ -67,7 +66,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private static final boolean MAINTAIN_ASPECT = false;
 
-  private static final Size DESIRED_PREVIEW_SIZE = new Size(640, 480);
+  private static final Size DESIRED_PREVIEW_SIZE = new Size(1920, 1080);
 
   private static final boolean SAVE_PREVIEW_BITMAP = false;
   private static final float TEXT_SIZE_DIP = 10;
@@ -270,7 +269,13 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 canvas.drawRect(location, paint);
 
                 cropToFrameTransform.mapRect(location);
-                result.setLocation(location);
+
+
+                /*float nLeft = previewWidth-location.right;
+                float nRight = nLeft + location.width();
+                RectF flipLocation = new RectF(nLeft,location.top,nRight,location.bottom);
+
+                result.setLocation(flipLocation);*/
                 mappedRecognitions.add(result);
               }
             }
