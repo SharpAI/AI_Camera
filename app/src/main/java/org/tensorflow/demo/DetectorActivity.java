@@ -127,7 +127,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     previewHeight = size.getHeight();
 
     sensorOrientation = rotation - getScreenOrientation();
-    LOGGER.i("Camera orientation relative to screen canvas: %d", sensorOrientation);
+    LOGGER.i("Camera orientation relative to screen canvas: %d, ScreenOrientation %d, rotation %d",
+            sensorOrientation,getScreenOrientation(), rotation);
 
     LOGGER.i("Initializing at size %dx%d", previewWidth, previewHeight);
     rgbFrameBitmap = Bitmap.createBitmap(previewWidth, previewHeight, Config.ARGB_8888);
@@ -232,6 +233,17 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
     final Canvas canvas = new Canvas(croppedBitmap);
     canvas.drawBitmap(rgbFrameBitmap, frameToCropTransform, null);
+
+    Matrix matrix = new Matrix();
+    float[] mirrorY = { -1, 0, 0, 0, 1, 0, 0, 0, 1};
+    Matrix matrixMirrorY = new Matrix();
+    matrixMirrorY.setValues(mirrorY);
+
+    matrix.postConcat(matrixMirrorY);
+    //matrix.postRotate(90);
+    croppedBitmap = Bitmap.createBitmap(croppedBitmap, 0, 0, croppedBitmap.getWidth(),
+            croppedBitmap.getHeight(),matrix, true);
+
     // For examining the actual TF input.
     if (SAVE_PREVIEW_BITMAP) {
       ImageUtils.saveBitmap(croppedBitmap);
