@@ -269,7 +269,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
                 canvas.drawRect(location, paint);
 
                 cropToFrameTransform.mapRect(location);
-
+                result.setLocation(location);
 
                 /*float nLeft = previewWidth-location.right;
                 float nRight = nLeft + location.width();
