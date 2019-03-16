@@ -1,1 +1,9 @@
+include ':easyrs'
+include ':rembrandtAndroid'
+include ':magicfilter'
+//include ':OpenCV3.1'
+include ':openCVLibrary341'
+include ':nativeLib'
+
+include ':sharpai-lib'
 include ':app'

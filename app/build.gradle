@@ -1,17 +1,37 @@
 apply plugin: 'com.android.application'
 
 android {
-    compileSdkVersion 26
-    buildToolsVersion '27.0.3'
+    compileSdkVersion 28
+    buildToolsVersion '28.0.3'
     defaultConfig {
         applicationId "org.tensorflow.lite.demo"
-        minSdkVersion 15
-        targetSdkVersion 26
+        minSdkVersion 21
+        targetSdkVersion 28
         versionCode 1
         versionName "1.0"
         ndk {
             abiFilters "armeabi-v7a"
         }
+    }
+    packagingOptions {
+        pickFirst 'lib/x86_64/libRSSupport.so'
+        pickFirst 'lib/armeabi/libRSSupport.so'
+        pickFirst 'lib/x86/libRSSupport.so'
+        pickFirst 'lib/armeabi-v7a/libRSSupport.so'
+        pickFirst 'lib/arm64-v8a/libRSSupport.so'
+
+        pickFirst 'lib/x86_64/librsjni.so'
+        pickFirst 'lib/armeabi/librsjni.so'
+        pickFirst 'lib/x86/librsjni.so'
+        pickFirst 'lib/armeabi-v7a/librsjni.so'
+        pickFirst 'lib/arm64-v8a/librsjni.so'
+
+        pickFirst 'lib/x86_64/librsjni_androidx.so'
+        pickFirst 'lib/armeabi/librsjni_androidx.so'
+        pickFirst 'lib/x86/librsjni_androidx.so'
+        pickFirst 'lib/armeabi-v7a/librsjni_androidx.so'
+        pickFirst 'lib/arm64-v8a/librsjni_androidx.so'
+
     }
     lintOptions {
         abortOnError false
@@ -50,4 +70,5 @@ dependencies {
     implementation fileTree(dir: 'libs', include: ['*.jar'])
     // implementation 'org.tensorflow:tensorflow-lite:0.0.0-nightly'
     implementation 'org.tensorflow:tensorflow-lite:0.0.0-gpu-experimental'
+    implementation project(':sharpai-lib')
 }

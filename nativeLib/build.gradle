@@ -1,0 +1,29 @@
+apply plugin: 'com.android.library'
+
+android {
+    compileSdkVersion = 27
+    defaultConfig {
+        minSdkVersion 18
+        externalNativeBuild {
+            cmake {
+                arguments  '-DANDROID_TOOLCHAIN=clang', '-DANDROID_STL=gnustl_static'
+                cppFlags "-std=c++11","-frtti", "-fexceptions"
+            }
+        }
+        ndk {
+            abiFilters 'armeabi-v7a'
+        }
+    }
+
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+
+}
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    implementation project(':openCVLibrary341')
+
+}

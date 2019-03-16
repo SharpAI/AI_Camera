@@ -1,0 +1,68 @@
+apply plugin: 'com.android.library'
+
+def version = '0.5.3'
+
+ext {
+    bintrayRepo = 'maven'
+    bintrayName = 'easyRS'
+
+    publishedGroupId = 'io.github.silvaren'
+    libraryName = 'easyRS'
+    artifact = 'easyrs'
+
+    libraryDescription = 'A set of convenience RenderScript tools for processing common Android image formats such as Bitmap and NV21.'
+
+    siteUrl = 'https://github.com/silvaren/easyrs'
+    gitUrl = 'https://github.com/silvaren/easyrs.git'
+
+    libraryVersion = version
+
+    developerId = 'silvaren'
+    developerName = 'Renato Silva'
+    developerEmail = 'renato.hawk@gmail.com'
+
+    licenseName = 'MIT'
+    licenseUrl = 'https://opensource.org/licenses/MIT'
+    allLicenses = ["MIT"]
+}
+
+android {
+    compileSdkVersion 23
+    buildToolsVersion '28.0.3'
+    defaultPublishConfig "debug"
+
+    defaultConfig {
+        minSdkVersion 21
+        targetSdkVersion 25
+        versionCode 1
+        versionName version
+        renderscriptTargetApi 16
+        renderscriptSupportModeEnabled true
+        testInstrumentationRunner "android.support.test.runner.AndroidJUnitRunner"
+    }
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+}
+
+dependencies {
+    implementation fileTree(dir: 'libs', include: ['*.jar'])
+    testImplementation 'junit:junit:4.12'
+    implementation 'com.android.support:appcompat-v7:27.1.1'
+    implementation 'com.google.guava:guava:19.0'
+    androidTestImplementation ('com.android.support.test:runner:0.5') {
+        exclude module: 'support-annotations'
+    }
+    androidTestImplementation ('com.android.support.test:rules:0.5') {
+        exclude module: 'support-annotations'
+    }
+    // Optional -- Hamcrest library
+    androidTestImplementation 'org.hamcrest:hamcrest-library:1.3'
+}
+
+// Place it at the end of the file
+apply from: 'installv1.gradle'
+apply from: 'bintrayv1.gradle'
