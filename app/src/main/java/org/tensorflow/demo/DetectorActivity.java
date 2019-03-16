@@ -41,6 +41,8 @@ import org.tensorflow.demo.env.Logger;
 import org.tensorflow.demo.tracking.MultiBoxTracker;
 import org.tensorflow.lite.demo.R; // Explicit import needed for internal Google builds.
 
+import tv.danmaku.ijk.media.example.widget.media.Detection;
+
 /**
  * An activity that uses a TensorFlowMultiBoxDetector and ObjectTracker to detect and then track
  * objects.
@@ -91,6 +93,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
   private byte[] luminanceCopy;
 
+  private Detection mDetection;
   private BorderedText borderedText;
   @Override
   public void onPreviewSizeChosen(final Size size, final int rotation) {
@@ -122,6 +125,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       finish();
     }
 
+    mDetection = new Detection(this);
 
     previewWidth = size.getWidth();
     previewHeight = size.getHeight();
@@ -229,6 +233,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       luminanceCopy = new byte[originalLuminance.length];
     }
     System.arraycopy(originalLuminance, 0, luminanceCopy, 0, originalLuminance.length);
+    mDetection.processBitmap(rgbFrameBitmap);
     readyForNextImage();
 
     final Canvas canvas = new Canvas(croppedBitmap);
