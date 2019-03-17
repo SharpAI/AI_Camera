@@ -327,6 +327,52 @@ public class Detection {
         //VideoActivity.setNumberOfFaces(face_num);
         return face_num;
     }
+
+    public int doFaceDetectionOnDetectedPersonAndSendTask(RectF rectf, Bitmap bmp){
+        long tsStart;
+        long tsEnd;
+        int face_num = 0;
+        String filename = "";
+        File file = null;
+
+        tsStart = System.currentTimeMillis();
+        Log.d(TAG,"recognition rect: "+rectf.toString());
+        Bitmap personBmp = getCropBitmapByCPU(bmp,rectf);
+        int num = mFaceDetector.predict_image(personBmp);
+        tsEnd = System.currentTimeMillis();
+        Log.v(TAG,"time diff (FD) "+(tsEnd-tsStart));
+        if(num > 0){
+            face_num+=num;
+            try {
+                tsStart = System.currentTimeMillis();
+                file = screenshot.getInstance()
+                        .saveScreenshotToPicturesFolder(mContext, personBmp, "frame_");
+
+                filename = file.getAbsolutePath();
+                tsEnd = System.currentTimeMillis();
+                Log.v(TAG,"time diff (Save) "+(tsEnd-tsStart));
+
+            } catch (Exception e) {
+                e.printStackTrace();
+
+                //delete all jpg file in Download dir when disk is full
+                deleteAllCapturedPics();
+            }
+            //bitmap.recycle();
+            //bitmap = null;
+            if(filename.equals("")){
+                return 0;
+            }
+            if(file == null){
+                return 0;
+            }
+
+            mLastTaskSentTimestamp = System.currentTimeMillis();
+            mBackgroundHandler.obtainMessage(PROCESS_SAVED_IMAGE_MSG, filename).sendToTarget();
+        }
+        //VideoActivity.setNumberOfFaces(face_num);
+        return face_num;
+    }
     public void doSendDummyTask(Bitmap bmp){
         String filename = "";
         File file = null;
@@ -436,6 +482,24 @@ public class Detection {
             }
         }
 
+        checkIfNeedSendDummyTask(bmp);
+
+        return;
+    }
+
+    public void processAndroidCameraBitmap(List<Classifier.Recognition> results,Bitmap bmp){
+        long tsStart = System.currentTimeMillis();
+        long tsEnd;
+
+        boolean bigChanged = true;
+
+        //clean up pictures every 2 mins
+        if (tsStart-mLastCleanPicsTimestamp > 2*60*1000) {
+            Log.d("##RDBG", "clean pictures every 2 mins");
+            mLastCleanPicsTimestamp = tsStart;
+            deleteAllCapturedPics();
+        }
+        doFaceDetectionAndSendTask(results,bmp);
         checkIfNeedSendDummyTask(bmp);
 
         return;

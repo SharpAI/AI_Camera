@@ -27,6 +27,7 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.ImageReader.OnImageAvailableListener;
 import android.os.SystemClock;
+import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
 import android.widget.Toast;
@@ -233,10 +234,8 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
       luminanceCopy = new byte[originalLuminance.length];
     }
     System.arraycopy(originalLuminance, 0, luminanceCopy, 0, originalLuminance.length);
-    mDetection.processBitmap(rgbFrameBitmap);
-    readyForNextImage();
 
-    final Canvas canvas = new Canvas(croppedBitmap);
+    Canvas canvas = new Canvas(croppedBitmap);
     canvas.drawBitmap(rgbFrameBitmap, frameToCropTransform, null);
 
     Matrix matrix = new Matrix();
@@ -253,57 +252,64 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     if (SAVE_PREVIEW_BITMAP) {
       ImageUtils.saveBitmap(croppedBitmap);
     }
+    LOGGER.i("Running detection on image " + currTimestamp);
+    final long startTime = SystemClock.uptimeMillis();
+    final List<Classifier.Recognition> results = detector.recognizeImage(croppedBitmap);
+    lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
 
-    runInBackground(
-        new Runnable() {
-          @Override
-          public void run() {
-            LOGGER.i("Running detection on image " + currTimestamp);
-            final long startTime = SystemClock.uptimeMillis();
-            final List<Classifier.Recognition> results = detector.recognizeImage(croppedBitmap);
-            lastProcessingTimeMs = SystemClock.uptimeMillis() - startTime;
+    cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
+    canvas = new Canvas(cropCopyBitmap);
+    final Paint paint = new Paint();
+    paint.setColor(Color.RED);
+    paint.setStyle(Style.STROKE);
+    paint.setStrokeWidth(2.0f);
 
-            cropCopyBitmap = Bitmap.createBitmap(croppedBitmap);
-            final Canvas canvas = new Canvas(cropCopyBitmap);
-            final Paint paint = new Paint();
-            paint.setColor(Color.RED);
-            paint.setStyle(Style.STROKE);
-            paint.setStrokeWidth(2.0f);
+    float minimumConfidence = MINIMUM_CONFIDENCE_TF_OD_API;
+    switch (MODE) {
+      case TF_OD_API:
+        minimumConfidence = MINIMUM_CONFIDENCE_TF_OD_API;
+        break;
+    }
 
-            float minimumConfidence = MINIMUM_CONFIDENCE_TF_OD_API;
-            switch (MODE) {
-              case TF_OD_API:
-                minimumConfidence = MINIMUM_CONFIDENCE_TF_OD_API;
-                break;
-            }
+    final List<Classifier.Recognition> mappedRecognitions =
+            new LinkedList<Classifier.Recognition>();
 
-            final List<Classifier.Recognition> mappedRecognitions =
-                new LinkedList<Classifier.Recognition>();
+    for (final Classifier.Recognition result : results) {
+      final RectF location = result.getLocation();
+      if (location != null && result.getConfidence() >= minimumConfidence) {
+        LOGGER.i("Result is "+result.toString());
+        if(result.getTitle().equals("person")){
+          canvas.drawRect(location, paint);
 
-            for (final Classifier.Recognition result : results) {
-              final RectF location = result.getLocation();
-              if (location != null && result.getConfidence() >= minimumConfidence) {
-                canvas.drawRect(location, paint);
-
-                cropToFrameTransform.mapRect(location);
-                result.setLocation(location);
+          cropToFrameTransform.mapRect(location);
+          result.setLocation(location);
 
                 /*float nLeft = previewWidth-location.right;
                 float nRight = nLeft + location.width();
                 RectF flipLocation = new RectF(nLeft,location.top,nRight,location.bottom);
 
                 result.setLocation(flipLocation);*/
-                mappedRecognitions.add(result);
-              }
-            }
+          mappedRecognitions.add(result);
+          mDetection.doFaceDetectionOnDetectedPersonAndSendTask(location,rgbFrameBitmap);
+        }
+      }
+    }
 
-            tracker.trackResults(mappedRecognitions, luminanceCopy, currTimestamp);
-            trackingOverlay.postInvalidate();
+    readyForNextImage();
+    tracker.trackResults(mappedRecognitions, luminanceCopy, currTimestamp);
+    trackingOverlay.postInvalidate();
 
-            requestRender();
-            computingDetection = false;
+    requestRender();
+    computingDetection = false;
+    /*
+    runInBackground(
+        new Runnable() {
+          @Override
+          public void run() {
+
           }
         });
+     */
   }
 
   @Override
