@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.tensorflow.demo;
+package org.sharpai.aicamera;
 
 import android.app.Activity;
 import android.app.AlertDialog;
@@ -58,7 +58,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
-import org.tensorflow.demo.env.Logger;
+import org.sharpai.aicamera.env.Logger;
 import org.tensorflow.lite.demo.R; // Explicit import needed for internal Google builds.
 
 public class CameraConnectionFragment extends Fragment {

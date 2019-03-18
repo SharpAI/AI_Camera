@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.tensorflow.demo;
+package org.sharpai.aicamera;
 
 import android.graphics.Bitmap;
 import android.graphics.Bitmap.Config;
@@ -27,7 +27,6 @@ import android.graphics.RectF;
 import android.graphics.Typeface;
 import android.media.ImageReader.OnImageAvailableListener;
 import android.os.SystemClock;
-import android.util.Log;
 import android.util.Size;
 import android.util.TypedValue;
 import android.widget.Toast;
@@ -35,10 +34,10 @@ import java.io.IOException;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Vector;
-import org.tensorflow.demo.OverlayView.DrawCallback;
-import org.tensorflow.demo.env.BorderedText;
-import org.tensorflow.demo.env.ImageUtils;
-import org.tensorflow.demo.env.Logger;
+import org.sharpai.aicamera.OverlayView.DrawCallback;
+import org.sharpai.aicamera.env.BorderedText;
+import org.sharpai.aicamera.env.ImageUtils;
+import org.sharpai.aicamera.env.Logger;
 import org.tensorflow.demo.tracking.MultiBoxTracker;
 import org.tensorflow.lite.demo.R; // Explicit import needed for internal Google builds.
 

@@ -31,10 +31,10 @@ import android.widget.Toast;
 import java.util.LinkedList;
 import java.util.List;
 import java.util.Queue;
-import org.tensorflow.demo.Classifier.Recognition;
-import org.tensorflow.demo.env.BorderedText;
-import org.tensorflow.demo.env.ImageUtils;
-import org.tensorflow.demo.env.Logger;
+import org.sharpai.aicamera.Classifier.Recognition;
+import org.sharpai.aicamera.env.BorderedText;
+import org.sharpai.aicamera.env.ImageUtils;
+import org.sharpai.aicamera.env.Logger;
 
 /**
  * A tracker wrapping ObjectTracker that also handles non-max suppression and matching existing

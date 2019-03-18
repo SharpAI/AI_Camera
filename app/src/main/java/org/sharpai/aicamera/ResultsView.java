@@ -13,10 +13,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-package org.tensorflow.demo;
+package org.sharpai.aicamera;
 
 import java.util.List;
-import org.tensorflow.demo.Classifier.Recognition;
+import org.sharpai.aicamera.Classifier.Recognition;
 
 public interface ResultsView {
   public void setResults(final List<Recognition> results);

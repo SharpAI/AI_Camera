@@ -14,7 +14,7 @@
  * limitations under the License.
  */
 
-package org.tensorflow.demo;
+package org.sharpai.aicamera;
 
 import android.Manifest;
 import android.app.Activity;
@@ -41,8 +41,8 @@ import android.view.Surface;
 import android.view.WindowManager;
 import android.widget.Toast;
 import java.nio.ByteBuffer;
-import org.tensorflow.demo.env.ImageUtils;
-import org.tensorflow.demo.env.Logger;
+import org.sharpai.aicamera.env.ImageUtils;
+import org.sharpai.aicamera.env.Logger;
 import org.tensorflow.lite.demo.R; // Explicit import needed for internal Google builds.
 
 public abstract class CameraActivity extends Activity

@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-package org.tensorflow.demo;
+package org.sharpai.aicamera;
 
 import android.content.Context;
 import android.graphics.Canvas;
@@ -22,7 +22,7 @@ import android.util.AttributeSet;
 import android.util.TypedValue;
 import android.view.View;
 import java.util.List;
-import org.tensorflow.demo.Classifier.Recognition;
+import org.sharpai.aicamera.Classifier.Recognition;
 
 public class RecognitionScoreView extends View implements ResultsView {
   private static final float TEXT_SIZE_DIP = 24;

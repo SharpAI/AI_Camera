@@ -29,8 +29,8 @@ import java.util.List;
 import java.util.Map;
 import java.util.Vector;
 import javax.microedition.khronos.opengles.GL10;
-import org.tensorflow.demo.env.Logger;
-import org.tensorflow.demo.env.Size;
+import org.sharpai.aicamera.env.Logger;
+import org.sharpai.aicamera.env.Size;
 
 /**
  * True object detector/tracker class that tracks objects across consecutive preview frames.

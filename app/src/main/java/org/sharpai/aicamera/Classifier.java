@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-package org.tensorflow.demo;
+package org.sharpai.aicamera;
 
 import android.graphics.Bitmap;
 import android.graphics.RectF;

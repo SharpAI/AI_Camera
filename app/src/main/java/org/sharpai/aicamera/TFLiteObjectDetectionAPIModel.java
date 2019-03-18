@@ -13,7 +13,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 ==============================================================================*/
 
-package org.tensorflow.demo;
+package org.sharpai.aicamera;
 
 import android.content.res.AssetFileDescriptor;
 import android.content.res.AssetManager;
@@ -34,7 +34,7 @@ import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
 import java.util.Vector;
-import org.tensorflow.demo.env.Logger;
+import org.sharpai.aicamera.env.Logger;
 import org.tensorflow.lite.Interpreter;
 import org.tensorflow.lite.experimental.GpuDelegate;
 
