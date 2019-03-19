@@ -39,7 +39,7 @@ import org.sharpai.aicamera.env.BorderedText;
 import org.sharpai.aicamera.env.ImageUtils;
 import org.sharpai.aicamera.env.Logger;
 import org.tensorflow.demo.tracking.MultiBoxTracker;
-import org.tensorflow.lite.demo.R; // Explicit import needed for internal Google builds.
+//import org.tensorflow.lite.demo.R; // Explicit import needed for internal Google builds.
 
 import tv.danmaku.ijk.media.example.widget.media.Detection;
 

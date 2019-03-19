@@ -43,7 +43,7 @@ import android.widget.Toast;
 import java.nio.ByteBuffer;
 import org.sharpai.aicamera.env.ImageUtils;
 import org.sharpai.aicamera.env.Logger;
-import org.tensorflow.lite.demo.R; // Explicit import needed for internal Google builds.
+//import org.tensorflow.lite.demo.R; // Explicit import needed for internal Google builds.
 
 public abstract class CameraActivity extends Activity
     implements OnImageAvailableListener, Camera.PreviewCallback {
