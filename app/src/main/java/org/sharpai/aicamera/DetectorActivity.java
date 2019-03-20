@@ -50,6 +50,7 @@ import tv.danmaku.ijk.media.example.widget.media.Detection;
 public class DetectorActivity extends CameraActivity implements OnImageAvailableListener {
   private static final Logger LOGGER = new Logger();
 
+  private static boolean IS_FRONTAL_CAMERA = true;
   // Configuration values for the prepackaged SSD model.
   private static final int TF_OD_API_INPUT_SIZE = 300;
   private static final boolean TF_OD_API_IS_QUANTIZED = true;
@@ -237,16 +238,17 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
     Canvas canvas = new Canvas(croppedBitmap);
     canvas.drawBitmap(rgbFrameBitmap, frameToCropTransform, null);
 
-    Matrix matrix = new Matrix();
-    float[] mirrorY = { -1, 0, 0, 0, 1, 0, 0, 0, 1};
-    Matrix matrixMirrorY = new Matrix();
-    matrixMirrorY.setValues(mirrorY);
-
-    matrix.postConcat(matrixMirrorY);
-    //matrix.postRotate(90);
-    croppedBitmap = Bitmap.createBitmap(croppedBitmap, 0, 0, croppedBitmap.getWidth(),
-            croppedBitmap.getHeight(),matrix, true);
-
+    if(IS_FRONTAL_CAMERA){
+      //Frontal Camera is mirrored, need flip it
+      Matrix matrix = new Matrix();
+      float[] mirrorY = { -1, 0, 0, 0, 1, 0, 0, 0, 1};
+      Matrix matrixMirrorY = new Matrix();
+      matrixMirrorY.setValues(mirrorY);
+      matrix.postConcat(matrixMirrorY);
+      //matrix.postRotate(90);
+      croppedBitmap = Bitmap.createBitmap(croppedBitmap, 0, 0, croppedBitmap.getWidth(),
+              croppedBitmap.getHeight(),matrix, true);
+    }
     // For examining the actual TF input.
     if (SAVE_PREVIEW_BITMAP) {
       ImageUtils.saveBitmap(croppedBitmap);
@@ -289,7 +291,7 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
                 result.setLocation(flipLocation);*/
           mappedRecognitions.add(result);
-          mDetection.doFaceDetectionOnDetectedPersonAndSendTask(location,rgbFrameBitmap);
+          mDetection.doFaceDetectionOnDetectedPersonAndSendTask(location,rgbFrameBitmap,sensorOrientation);
         }
       }
     }

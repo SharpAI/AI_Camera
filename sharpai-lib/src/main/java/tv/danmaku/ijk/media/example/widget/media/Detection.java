@@ -18,6 +18,7 @@ import android.util.Log;
 import com.mtcnn_as.FaceDetector;
 import com.sharpai.detector.Classifier;
 import com.sharpai.detector.Detector;
+import com.sharpai.detector.env.ImageUtils;
 import com.sharpai.pim.MotionDetectionRS;
 
 import org.opencv.android.OpenCVLoader;
@@ -328,7 +329,7 @@ public class Detection {
         return face_num;
     }
 
-    public int doFaceDetectionOnDetectedPersonAndSendTask(RectF rectf, Bitmap bmp){
+    public int doFaceDetectionOnDetectedPersonAndSendTask(RectF rectf, Bitmap bmp, int sensorOrientation){
         long tsStart;
         long tsEnd;
         int face_num = 0;
@@ -338,7 +339,16 @@ public class Detection {
         tsStart = System.currentTimeMillis();
         Log.d(TAG,"recognition rect: "+rectf.toString());
         Bitmap personBmp = getCropBitmapByCPU(bmp,rectf);
-        int num = mFaceDetector.predict_image(personBmp);
+        Matrix frameRotationTransform =
+                ImageUtils.getTransformationMatrix(
+                        personBmp.getWidth(), personBmp.getHeight(),
+                        personBmp.getHeight(), personBmp.getWidth(),
+                        sensorOrientation, false);
+        Bitmap rotatedBmp = Bitmap.createBitmap(personBmp.getHeight(), personBmp.getWidth(), Bitmap.Config.ARGB_8888);
+        Canvas canvas = new Canvas(rotatedBmp);
+        canvas.drawBitmap(personBmp, frameRotationTransform, null);
+
+        int num = mFaceDetector.predict_image(rotatedBmp);
         tsEnd = System.currentTimeMillis();
         Log.v(TAG,"time diff (FD) "+(tsEnd-tsStart));
         if(num > 0){
@@ -346,7 +356,7 @@ public class Detection {
             try {
                 tsStart = System.currentTimeMillis();
                 file = screenshot.getInstance()
-                        .saveScreenshotToPicturesFolder(mContext, personBmp, "frame_");
+                        .saveScreenshotToPicturesFolder(mContext, rotatedBmp, "frame_");
 
                 filename = file.getAbsolutePath();
                 tsEnd = System.currentTimeMillis();
