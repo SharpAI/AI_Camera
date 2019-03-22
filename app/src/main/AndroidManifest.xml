@@ -40,8 +40,8 @@
         android:icon="@drawable/ic_launcher"
         android:theme="@style/MaterialTheme">
 
-        <activity android:name="org.sharpai.aicamera.DetectorActivity"
-                  android:screenOrientation="portrait"
+        <activity android:name="org.sharpai.aicamera.MainActivity"
+                  android:screenOrientation="landscape"
                   android:label="@string/activity_name_detection">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />

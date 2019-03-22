@@ -34,7 +34,6 @@ import java.io.IOException;
 import java.util.List;
 import org.sharpai.aicamera.env.ImageUtils;
 import org.sharpai.aicamera.env.Logger;
-import org.tensorflow.lite.demo.R; // Explicit import needed for internal Google builds.
 
 public class LegacyCameraConnectionFragment extends Fragment {
   private Camera camera;

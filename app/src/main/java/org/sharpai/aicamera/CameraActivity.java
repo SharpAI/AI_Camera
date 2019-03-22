@@ -67,9 +67,6 @@ public abstract class CameraActivity extends Activity
   protected int previewWidth = 0;
   protected int previewHeight = 0;
 
-  private Runnable postInferenceCallback;
-  private Runnable imageConverter;
-
   @Override
   protected void onCreate(final Bundle savedInstanceState) {
     LOGGER.d("onCreate " + this);
@@ -87,7 +84,6 @@ public abstract class CameraActivity extends Activity
 
 
   protected int[] getRgbBytes() {
-    imageConverter.run();
     return rgbBytes;
   }
 
@@ -127,23 +123,11 @@ public abstract class CameraActivity extends Activity
     yuvBytes[0] = bytes;
     yRowStride = previewWidth;
 
-    imageConverter =
-        new Runnable() {
-          @Override
-          public void run() {
-            ImageUtils.convertYUV420SPToARGB8888(bytes, previewWidth, previewHeight, rgbBytes);
-          }
-        };
+    ImageUtils.convertYUV420SPToARGB8888(bytes, previewWidth, previewHeight, rgbBytes);
 
-    postInferenceCallback =
-        new Runnable() {
-          @Override
-          public void run() {
-            camera.addCallbackBuffer(bytes);
-            isProcessingFrame = false;
-          }
-        };
+    camera.addCallbackBuffer(bytes);
     processImage();
+    isProcessingFrame = false;
   }
 
   /**
@@ -167,6 +151,7 @@ public abstract class CameraActivity extends Activity
 
       if (isProcessingFrame) {
         image.close();
+        //reader.discardFreeBuffers();
         return;
       }
       isProcessingFrame = true;
@@ -177,33 +162,22 @@ public abstract class CameraActivity extends Activity
       final int uvRowStride = planes[1].getRowStride();
       final int uvPixelStride = planes[1].getPixelStride();
 
-      imageConverter =
-          new Runnable() {
-            @Override
-            public void run() {
-              ImageUtils.convertYUV420ToARGB8888(
-                  yuvBytes[0],
-                  yuvBytes[1],
-                  yuvBytes[2],
-                  previewWidth,
-                  previewHeight,
-                  yRowStride,
-                  uvRowStride,
-                  uvPixelStride,
-                  rgbBytes);
-            }
-          };
+      ImageUtils.convertYUV420ToARGB8888(
+              yuvBytes[0],
+              yuvBytes[1],
+              yuvBytes[2],
+              previewWidth,
+              previewHeight,
+              yRowStride,
+              uvRowStride,
+              uvPixelStride,
+              rgbBytes);
 
-      postInferenceCallback =
-          new Runnable() {
-            @Override
-            public void run() {
-              image.close();
-              isProcessingFrame = false;
-            }
-          };
+      image.close();
+      //reader.close();
+      //processImage();
+      isProcessingFrame = false;
 
-      processImage();
     } catch (final Exception e) {
       LOGGER.e(e, "Exception!");
       Trace.endSection();
@@ -261,12 +235,6 @@ public abstract class CameraActivity extends Activity
     super.onDestroy();
   }
 
-  protected synchronized void runInBackground(final Runnable r) {
-    if (handler != null) {
-      handler.post(r);
-    }
-  }
-
   @Override
   public void onRequestPermissionsResult(
       final int requestCode, final String[] permissions, final int[] grantResults) {
@@ -310,41 +278,6 @@ public abstract class CameraActivity extends Activity
     }
     // deviceLevel is not LEGACY, can use numerical sort
     return requiredLevel <= deviceLevel;
-  }
-
-  private String chooseCameraBack() {
-    final CameraManager manager = (CameraManager) getSystemService(Context.CAMERA_SERVICE);
-    try {
-      for (final String cameraId : manager.getCameraIdList()) {
-        final CameraCharacteristics characteristics = manager.getCameraCharacteristics(cameraId);
-
-        // We don't use a front facing camera in this sample.
-        final Integer facing = characteristics.get(CameraCharacteristics.LENS_FACING);
-        if (facing != null && facing == CameraCharacteristics.LENS_FACING_FRONT) {
-          continue;
-        }
-
-        final StreamConfigurationMap map =
-            characteristics.get(CameraCharacteristics.SCALER_STREAM_CONFIGURATION_MAP);
-
-        if (map == null) {
-          continue;
-        }
-
-        // Fallback to camera1 API for internal cameras that don't have full support.
-        // This should help with legacy situations where using the camera2 API causes
-        // distorted or otherwise broken previews.
-        useCamera2API = (facing == CameraCharacteristics.LENS_FACING_EXTERNAL)
-            || isHardwareLevelSupported(characteristics, 
-                                        CameraCharacteristics.INFO_SUPPORTED_HARDWARE_LEVEL_FULL);
-        LOGGER.i("Camera API lv2?: %s", useCamera2API);
-        return cameraId;
-      }
-    } catch (CameraAccessException e) {
-      LOGGER.e(e, "Not allowed to access camera");
-    }
-
-    return null;
   }
 
   private String chooseCamera() {
@@ -458,12 +391,6 @@ public abstract class CameraActivity extends Activity
       return true;
     }
     return super.onKeyDown(keyCode, event);
-  }
-
-  protected void readyForNextImage() {
-    if (postInferenceCallback != null) {
-      postInferenceCallback.run();
-    }
   }
 
   protected int getScreenOrientation() {

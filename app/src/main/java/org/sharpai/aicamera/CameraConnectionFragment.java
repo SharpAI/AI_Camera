@@ -59,8 +59,6 @@ import java.util.List;
 import java.util.concurrent.Semaphore;
 import java.util.concurrent.TimeUnit;
 import org.sharpai.aicamera.env.Logger;
-import org.tensorflow.lite.demo.R; // Explicit import needed for internal Google builds.
-
 public class CameraConnectionFragment extends Fragment {
   private static final Logger LOGGER = new Logger();
 

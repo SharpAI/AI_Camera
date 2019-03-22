@@ -40,6 +40,7 @@ import java.util.Date;
 import java.util.List;
 
 import elanic.in.rsenhancer.processing.RSImageProcessor;
+import io.github.silvaren.easyrs.tools.Nv21Image;
 import tv.danmaku.ijk.media.example.utils.screenshot;
 
 //import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_CANCEL;
@@ -581,6 +582,9 @@ public class Detection {
         //}
 
         return resultBitmap;
+    }
+    public Bitmap yuv2Bitmap(byte[] data,int width,int height){
+        return Nv21Image.nv21ToBitmap(mRS,data,width,height);
     }
     private Thread mDeletePicsThread = null;
 

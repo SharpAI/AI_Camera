@@ -218,11 +218,11 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
         sensorOrientation,
         originalLuminance,
         timestamp);
-    trackingOverlay.postInvalidate();
+    //trackingOverlay.postInvalidate();
 
     // No mutex needed as this method is not reentrant.
     if (computingDetection) {
-      readyForNextImage();
+      //readyForNextImage();
       return;
     }
     computingDetection = true;
@@ -284,33 +284,18 @@ public class DetectorActivity extends CameraActivity implements OnImageAvailable
 
           cropToFrameTransform.mapRect(location);
           result.setLocation(location);
-
-                /*float nLeft = previewWidth-location.right;
-                float nRight = nLeft + location.width();
-                RectF flipLocation = new RectF(nLeft,location.top,nRight,location.bottom);
-
-                result.setLocation(flipLocation);*/
           mappedRecognitions.add(result);
           mDetection.doFaceDetectionOnDetectedPersonAndSendTask(location,rgbFrameBitmap,sensorOrientation);
         }
       }
     }
 
-    readyForNextImage();
+    //readyForNextImage();
     tracker.trackResults(mappedRecognitions, luminanceCopy, currTimestamp);
     trackingOverlay.postInvalidate();
 
     requestRender();
     computingDetection = false;
-    /*
-    runInBackground(
-        new Runnable() {
-          @Override
-          public void run() {
-
-          }
-        });
-     */
   }
 
   @Override
