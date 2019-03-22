@@ -2,15 +2,23 @@ package org.sharpai.aicamera;
 
 import android.Manifest;
 import android.app.Activity;
+import android.content.Context;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
+import android.hardware.Sensor;
+import android.hardware.SensorEvent;
+import android.hardware.SensorEventListener;
+import android.hardware.SensorManager;
 import android.os.Build;
 import android.os.Bundle;
 import android.provider.Settings;
+import android.view.Gravity;
+import android.view.LayoutInflater;
 import android.view.WindowManager;
 import android.widget.FrameLayout;
 import android.widget.ImageView;
+import android.widget.PopupWindow;
 import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
@@ -40,6 +48,51 @@ public class MainActivity extends Activity {
     private Camera mCamera;
     private CameraPreview mPreview;
     private Camera.CameraInfo mCameraInfo;
+
+    private long mLastNotifyStamp = System.currentTimeMillis();
+    private boolean mNotifyPopupShown = false;
+    private PopupWindow mNotifyPopupWindow = null;
+
+    private SensorEventListener mSel = new SensorEventListener() {
+        @Override
+        public void onSensorChanged(SensorEvent sensorEvent) {
+            if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                float x = sensorEvent.values[0];
+                float y = sensorEvent.values[1];
+                double angle = Math.atan2(x, y)/(Math.PI/180);
+                if (angle < 105 && angle > 75) {
+                    if (mNotifyPopupWindow != null) {
+                        mNotifyPopupWindow.dismiss();
+                    }
+                    mNotifyPopupShown = false;
+                }
+                else {
+                    if (mNotifyPopupWindow != null) {
+                        if (!mNotifyPopupShown) {
+                            mNotifyPopupShown = true;
+                            mNotifyPopupWindow.showAtLocation(mPreview, Gravity.CENTER, 0, 0);
+                        }
+                    }
+
+                    long curStamp = System.currentTimeMillis();
+                    if (curStamp - mLastNotifyStamp > 5000) {
+                        Toast.makeText(MainActivity.this, "请调整平板角度, 箭头朝上", Toast.LENGTH_SHORT).show();
+                        mLastNotifyStamp = curStamp;
+
+                        if (mNotifyPopupWindow == null) {
+                            LayoutInflater inflater = (LayoutInflater)MainActivity.this.getSystemService(Context.LAYOUT_INFLATER_SERVICE);
+                            mNotifyPopupWindow = new PopupWindow(inflater.inflate(R.layout.popup_orientation_guide, null, false), 200, 200);
+                        }
+                    }
+                }
+            }
+        }
+
+        @Override
+        public void onAccuracyChanged(Sensor sensor, int i) {
+
+        }
+    };
 
     /** A safe way to get an instance of the Camera object. */
     public Camera getCameraInstance(){
@@ -158,6 +211,10 @@ public class MainActivity extends Activity {
         if (mCamera == null) {
             mCamera = getCameraInstance();
         }
+
+        SensorManager sm = (SensorManager)getSystemService(SENSOR_SERVICE);
+        Sensor accelerator = sm.getDefaultSensor(Sensor.TYPE_ACCELEROMETER);
+        sm.registerListener(mSel, accelerator, SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
@@ -169,6 +226,9 @@ public class MainActivity extends Activity {
             mCamera = null;
         }
         getWindow().clearFlags(WindowManager.LayoutParams.FLAG_KEEP_SCREEN_ON);
+
+        SensorManager sm = (SensorManager)getSystemService(SENSOR_SERVICE);
+        sm.unregisterListener(mSel);
     }
 
     @Override
