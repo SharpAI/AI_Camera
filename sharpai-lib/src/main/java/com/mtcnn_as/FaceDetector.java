@@ -22,7 +22,7 @@ public class FaceDetector {
 
     public FaceDetector(Context context) {
         mContext = context;
-        //拷贝模型到sk卡
+        //copy model
         try {
             copyBigDataToCache("det1.bin");
             copyBigDataToCache("det2.bin");
@@ -34,7 +34,7 @@ public class FaceDetector {
             e.printStackTrace();
         }
         //模型初始化
-        File sdDir = context.getCacheDir();//获取跟目录
+        File sdDir = context.getCacheDir();//Get folder path
         Log.i("SDdir", sdDir.toString());
         String sdPath = sdDir.toString();
         mtcnn.FaceDetectionModelInit(sdPath);
@@ -49,16 +49,16 @@ public class FaceDetector {
 
         if (threadsNumber != 1&&threadsNumber != 2&&threadsNumber != 4&&threadsNumber != 8){
             Log.i(TAG, "线程数："+threadsNumber);
-            //infoResult.setText("线程数必须是（1，2，4，8）之一");
+            //infoResult.setText("thread number must be one of（1，2，4，8)");
             return 0;
         }
 
-        //Log.i(TAG, "最小人脸："+minFaceSize);
+        //Log.i(TAG, "Minimal Face："+minFaceSize);
         //mtcnn.SetMinFaceSize(minFaceSize);
         //mtcnn.SetTimeCount(testTimeCount);
         //mtcnn.SetThreadsNumber(threadsNumber);
 
-        //检测流程
+        //Detect Procedure
         int width = yourSelectedImage.getWidth();
         int height = yourSelectedImage.getHeight();
         byte[] imageDate = getPixelsRGBA(yourSelectedImage);
@@ -67,14 +67,14 @@ public class FaceDetector {
         int faceInfo[] = null;
         if(!maxFaceSetting) {
             faceInfo = mtcnn.FaceDetect(imageDate, width, height, 4);
-            Log.i(TAG, "检测所有人脸");
+            Log.i(TAG, "Detect all faces");
         }
         else{
             faceInfo = mtcnn.MaxFaceDetect(imageDate, width, height, 4);
-            Log.i(TAG, "检测最大人脸");
+            Log.i(TAG, "Detect max face");
         }
         timeDetectFace = System.currentTimeMillis() - timeDetectFace;
-        Log.i(TAG, "人脸平均检测时间："+timeDetectFace/testTimeCount);
+        Log.i(TAG, "Average duration cost of face detection："+timeDetectFace/testTimeCount);
 
         if(faceInfo.length>1){
             int faceNum = faceInfo[0];
@@ -83,7 +83,7 @@ public class FaceDetector {
             //if (index == times){
                 //infoResult.setText("视频播放结束");
             //}
-            Log.i(TAG, "图宽："+width+"高："+height+" 人脸数目：" + faceNum );
+            Log.i(TAG, "face width："+width+"height："+height+" number of faces：" + faceNum );
             return faceNum;
 /*
             Bitmap drawBitmap = yourSelectedImage.copy(Bitmap.Config.ARGB_8888, true);
@@ -124,7 +124,7 @@ public class FaceDetector {
         return 0;
     }
 
-    //提取像素点
+    //get pixels
     private byte[] getPixelsRGBA(Bitmap image) {
         // calculate how many bytes our image consists of
         int bytes = image.getByteCount();
