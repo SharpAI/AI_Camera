@@ -23,7 +23,9 @@ import com.sharpai.pim.MotionDetectionRS;
 
 import org.opencv.android.OpenCVLoader;
 import org.opencv.android.Utils;
+import org.opencv.core.Core;
 import org.opencv.core.Mat;
+import org.opencv.core.MatOfDouble;
 import org.opencv.core.MatOfPoint;
 import org.opencv.core.Rect;
 import org.opencv.imgproc.Imgproc;
@@ -345,6 +347,22 @@ public class Detection {
 
         return "front";
     }
+    private int calcBitmapBlurry(Bitmap bmp){
+        Mat mat = new Mat();
+        Bitmap bmp32 = bmp.copy(Bitmap.Config.ARGB_8888, true);
+        Utils.bitmapToMat(bmp32, mat);
+
+        Mat matGray = new Mat();
+        Mat destination = new Mat();
+
+        Imgproc.cvtColor(mat, matGray, Imgproc.COLOR_BGR2GRAY);
+        Imgproc.Laplacian(matGray, destination, 3);
+        MatOfDouble median = new MatOfDouble();
+        MatOfDouble std = new MatOfDouble();
+        Core.meanStdDev(destination, median, std);
+
+        return (int) Math.pow(std.get(0, 0)[0], 2.0);
+    }
     public int doFaceDetectionAndSendTask(List<Classifier.Recognition> result, Bitmap bmp){
         long tsStart;
         long tsEnd;
@@ -380,12 +398,13 @@ public class Detection {
 
                     Bitmap faceBmp = getCropBitmapByCPU(personBmp,faceRectF);
                     Bitmap resizedBmp = mMotionDetection.resizeBmp(faceBmp,FACE_SAVING_WIDTH,FACE_SAVING_HEIGHT);
+                    int blurryValue = calcBitmapBlurry(resizedBmp);
                     File faceFile = screenshot.getInstance()
                             .saveFaceToPicturesFolder(mContext, resizedBmp, "face_");
 
                     tsEnd = System.currentTimeMillis();
                     Log.v(TAG,"time diff (Save) "+(tsEnd-tsStart));
-                    Log.d(TAG,"Saving face into "+faceFile.getAbsolutePath());
+                    Log.d(TAG,"Blurry value of face is "+blurryValue+"Saving face into "+faceFile.getAbsolutePath());
 
                 } catch (Exception e) {
                     e.printStackTrace();
