@@ -76,7 +76,7 @@ public class MainActivity extends Activity {
 
                     long curStamp = System.currentTimeMillis();
                     if (curStamp - mLastNotifyStamp > 5000) {
-                        Toast.makeText(MainActivity.this, "请调整平板角度, 箭头朝上", Toast.LENGTH_SHORT).show();
+                        Toast.makeText(MainActivity.this, R.string.adjust_text, Toast.LENGTH_SHORT).show();
                         mLastNotifyStamp = curStamp;
 
                         if (mNotifyPopupWindow == null) {
@@ -230,7 +230,6 @@ public class MainActivity extends Activity {
         SensorManager sm = (SensorManager)getSystemService(SENSOR_SERVICE);
         sm.unregisterListener(mSel);
     }
-
     @Override
     public void onRequestPermissionsResult(
             final int requestCode, final String[] permissions, final int[] grantResults) {
