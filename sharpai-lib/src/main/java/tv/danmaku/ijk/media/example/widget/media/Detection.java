@@ -43,6 +43,8 @@ import elanic.in.rsenhancer.processing.RSImageProcessor;
 import io.github.silvaren.easyrs.tools.Nv21Image;
 import tv.danmaku.ijk.media.example.utils.screenshot;
 
+import static java.lang.Math.abs;
+
 //import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_CANCEL;
 //import static com.arthenica.mobileffmpeg.FFmpeg.RETURN_CODE_SUCCESS;
 
@@ -79,6 +81,9 @@ public class Detection {
     private int DETECTION_IMAGE_HEIGHT = 480;
     private int PREVIEW_IMAGE_WIDTH = 1920;
     private int PREVIEW_IMAGE_HEIGHT = 1080;
+
+    private static final int FACE_SAVING_WIDTH = 112;
+    private static final int FACE_SAVING_HEIGHT = 112;
 
     private static final int PROCESS_FRAMES_AFTER_MOTION_DETECTED = 3;
 
@@ -280,6 +285,66 @@ public class Detection {
         //VideoActivity.setPixelDiff(diffarea);
         return rects.size()>0;
     }
+    private RectF getFaceRectF(int []faceInfo){
+
+        int left, top, right, bottom;
+        int i = 0;
+        left = faceInfo[1+14*i];
+        top = faceInfo[2+14*i];
+        right = faceInfo[3+14*i];
+        bottom = faceInfo[4+14*i];
+
+        RectF faceRectf = new RectF(left,top,right,bottom);
+        return faceRectf;
+    }
+    private String calcFaceStyle(int[] faceInfo){
+        int left, top, right, bottom;
+        int i = 0;
+        left = faceInfo[1+14*i];
+        top = faceInfo[2+14*i];
+        right = faceInfo[3+14*i];
+        bottom = faceInfo[4+14*i];
+
+        RectF faceRect = new RectF(left,top,right,bottom);
+        //画特征点
+
+        int[] eye_1 = new int[2];
+        int[] eye_2 = new int[2];
+        eye_1[0] = faceInfo[5+14*i];
+        eye_2[0] = faceInfo[6+14*i];
+        eye_1[1] = faceInfo[10+14*i];
+        eye_2[1] = faceInfo[11+14*i];
+
+        int eye_distance = abs(eye_1[0]-eye_2[0]);
+
+        Rect rect = new Rect(left,top,right,bottom);
+
+        int middle_point = (left + right)/2;
+        int y_middle_point = (top + bottom) / 2;
+
+
+        if (eye_1[0] > middle_point){
+            Log.d(TAG,"(Left Eye on the Right) Add style");
+            return "left_side";
+        }
+        if (eye_2[0] < middle_point){
+            Log.d(TAG,"(Right Eye on the left) Add style");
+            return "right_side";
+        }
+        if (Math.max(eye_1[1], eye_2[1]) > y_middle_point){
+            Log.d(TAG,"(Eye lower than middle of face) Skip");
+            return "lower_head";
+        }
+        if (faceRect.width()/eye_distance > 6){
+            Log.d(TAG,"side_face, eye distance is "+eye_distance+", face width is "+faceRect.width());
+            return "side_face";
+        }
+        //#elif nose[1] < y_middle_point:
+        //#    # 鼻子的y轴高于图片的中间高度，就认为是抬头
+        //#    style.append('raise_head')
+
+        return "front";
+    }
     public int doFaceDetectionAndSendTask(List<Classifier.Recognition> result, Bitmap bmp){
         long tsStart;
         long tsEnd;
@@ -292,19 +357,35 @@ public class Detection {
             RectF rectf = recognition.getLocation();
             Log.d(TAG,"recognition rect: "+rectf.toString());
             Bitmap personBmp = getCropBitmapByCPU(bmp,rectf);
-            int num = mFaceDetector.predict_image(personBmp);
+            int[] face_info = mFaceDetector.predict_image(personBmp);
             tsEnd = System.currentTimeMillis();
             Log.v(TAG,"time diff (FD) "+(tsEnd-tsStart));
+
+            int num = 0;
+            if(face_info != null && face_info.length > 0){
+                num = face_info[0];
+            }
             if(num > 0){
                 face_num+=num;
                 try {
                     tsStart = System.currentTimeMillis();
                     file = screenshot.getInstance()
-                            .saveScreenshotToPicturesFolder(mContext, personBmp, "frame_");
+                            .saveScreenshotToPicturesFolder(mContext, personBmp, "person_");
 
                     filename = file.getAbsolutePath();
+
+                    String faceStyle = calcFaceStyle(face_info);
+                    Log.d(TAG,"Face style is "+faceStyle);
+                    RectF faceRectF = getFaceRectF(face_info);
+
+                    Bitmap faceBmp = getCropBitmapByCPU(personBmp,faceRectF);
+                    Bitmap resizedBmp = mMotionDetection.resizeBmp(faceBmp,FACE_SAVING_WIDTH,FACE_SAVING_HEIGHT);
+                    File faceFile = screenshot.getInstance()
+                            .saveFaceToPicturesFolder(mContext, resizedBmp, "face_");
+
                     tsEnd = System.currentTimeMillis();
                     Log.v(TAG,"time diff (Save) "+(tsEnd-tsStart));
+                    Log.d(TAG,"Saving face into "+faceFile.getAbsolutePath());
 
                 } catch (Exception e) {
                     e.printStackTrace();
@@ -326,61 +407,6 @@ public class Detection {
             }
         }
 
-        //VideoActivity.setNumberOfFaces(face_num);
-        return face_num;
-    }
-
-    public int doFaceDetectionOnDetectedPersonAndSendTask(RectF rectf, Bitmap bmp, int sensorOrientation){
-        long tsStart;
-        long tsEnd;
-        int face_num = 0;
-        String filename = "";
-        File file = null;
-
-        tsStart = System.currentTimeMillis();
-        Log.d(TAG,"recognition rect: "+rectf.toString());
-        Bitmap personBmp = getCropBitmapByCPU(bmp,rectf);
-        Matrix frameRotationTransform =
-                ImageUtils.getTransformationMatrix(
-                        personBmp.getWidth(), personBmp.getHeight(),
-                        personBmp.getHeight(), personBmp.getWidth(),
-                        sensorOrientation, false);
-        Bitmap rotatedBmp = Bitmap.createBitmap(personBmp.getHeight(), personBmp.getWidth(), Bitmap.Config.ARGB_8888);
-        Canvas canvas = new Canvas(rotatedBmp);
-        canvas.drawBitmap(personBmp, frameRotationTransform, null);
-
-        int num = mFaceDetector.predict_image(rotatedBmp);
-        tsEnd = System.currentTimeMillis();
-        Log.v(TAG,"time diff (FD) "+(tsEnd-tsStart));
-        if(num > 0){
-            face_num+=num;
-            try {
-                tsStart = System.currentTimeMillis();
-                file = screenshot.getInstance()
-                        .saveScreenshotToPicturesFolder(mContext, rotatedBmp, "frame_");
-
-                filename = file.getAbsolutePath();
-                tsEnd = System.currentTimeMillis();
-                Log.v(TAG,"time diff (Save) "+(tsEnd-tsStart));
-
-            } catch (Exception e) {
-                e.printStackTrace();
-
-                //delete all jpg file in Download dir when disk is full
-                deleteAllCapturedPics();
-            }
-            //bitmap.recycle();
-            //bitmap = null;
-            if(filename.equals("")){
-                return 0;
-            }
-            if(file == null){
-                return 0;
-            }
-
-            mLastTaskSentTimestamp = System.currentTimeMillis();
-            mBackgroundHandler.obtainMessage(PROCESS_SAVED_IMAGE_MSG, filename).sendToTarget();
-        }
         //VideoActivity.setNumberOfFaces(face_num);
         return face_num;
     }
@@ -498,7 +524,7 @@ public class Detection {
         return;
     }
 
-    public void processAndroidCameraBitmap(List<Classifier.Recognition> results,Bitmap bmp){
+    /*public void processAndroidCameraBitmap(List<Classifier.Recognition> results,Bitmap bmp){
         long tsStart = System.currentTimeMillis();
         long tsEnd;
 
@@ -514,7 +540,7 @@ public class Detection {
         checkIfNeedSendDummyTask(bmp);
 
         return;
-    }
+    }*/
     private File getOutputMediaFile(String filename) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.

@@ -16,7 +16,7 @@ public class FaceDetector {
     private int threadsNumber = 2;
 
     private final String TAG="FaceDetector";
-    private boolean maxFaceSetting = false;
+    private boolean maxFaceSetting = true;
     private MTCNN mtcnn = new MTCNN();
     Context mContext;
 
@@ -43,14 +43,14 @@ public class FaceDetector {
         mtcnn.SetThreadsNumber(threadsNumber);
     }
 
-    public int predict_image(Bitmap yourSelectedImage){
+    public int[] predict_image(Bitmap yourSelectedImage){
         if (yourSelectedImage == null)
-            return 0;
+            return null;
 
         if (threadsNumber != 1&&threadsNumber != 2&&threadsNumber != 4&&threadsNumber != 8){
             Log.i(TAG, "线程数："+threadsNumber);
             //infoResult.setText("thread number must be one of（1，2，4，8)");
-            return 0;
+            return null;
         }
 
         //Log.i(TAG, "Minimal Face："+minFaceSize);
@@ -76,15 +76,15 @@ public class FaceDetector {
         timeDetectFace = System.currentTimeMillis() - timeDetectFace;
         Log.i(TAG, "Average duration cost of face detection："+timeDetectFace/testTimeCount);
 
-        if(faceInfo.length>1){
+        if(faceInfo.length>=1){
             int faceNum = faceInfo[0];
             //infoResult.setText("图宽："+width+"高："+height+"人脸平均检测时间："+timeDetectFace/testTimeCount+" 数目：" + faceNum +
             //        index + "/" + times);
             //if (index == times){
-                //infoResult.setText("视频播放结束");
+            //infoResult.setText("视频播放结束");
             //}
-            Log.i(TAG, "face width："+width+"height："+height+" number of faces：" + faceNum );
-            return faceNum;
+            Log.i(TAG, "person width："+width+"height："+height+" number of faces：" + faceNum );
+            return faceInfo;
 /*
             Bitmap drawBitmap = yourSelectedImage.copy(Bitmap.Config.ARGB_8888, true);
             for(int i=0;i<faceNum;i++) {
@@ -100,6 +100,20 @@ public class FaceDetector {
                 paint.setStrokeWidth(5);  //线的宽度
                 canvas.drawRect(left, top, right, bottom, paint);
                 //画特征点
+                eye_distance = abs(eye_1[0]-eye_2[0])
+
+                eye_1[0] = faceInfo[5+14*i]
+                eye_2[0] = faceInfo[6+14*i]
+
+                max(eye_1[1], eye_2[1]) > y_middle_point
+                eye_1[1] = faceInfo[10+14*i]
+                eye_2[1] = faceInfo[11+14*i]
+
+                Rect rect = new Rect(left,top,right,bottom);
+
+                middle_point = (left + right)/2
+                y_middle_point = (top + bottom) / 2
+
                 canvas.drawPoints(new float[]{faceInfo[5+14*i],faceInfo[10+14*i],
                         faceInfo[6+14*i],faceInfo[11+14*i],
                         faceInfo[7+14*i],faceInfo[12+14*i],
@@ -115,13 +129,13 @@ public class FaceDetector {
         }else{
             //infoResult.setText("未检测到人脸" + index + "/" + times);
             //if (index == times){
-                //infoResult.setText("视频播放结束");
+            //infoResult.setText("视频播放结束");
             //}
             //Message msg = new Message();
             //msg.obj = yourSelectedImage;
             //update_ui.sendMessage(msg);
         }
-        return 0;
+        return null;
     }
 
     //get pixels

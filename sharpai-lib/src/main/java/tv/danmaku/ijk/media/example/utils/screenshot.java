@@ -117,7 +117,34 @@ public class screenshot {
         //        new String[] { "image/jpeg" }, null);
         return bitmapFile;
     }
+    /**
+     * Save screenshot to pictures folder.
+     *
+     * @param context
+     *     the context
+     * @param image
+     *     the image
+     * @param filename
+     *     the filename
+     * @return the bitmap file object
+     * @throws Exception
+     *     the exception
+     */
+    public File saveFaceToPicturesFolder(Context context, Bitmap image, String filename)
+            throws Exception {
+        File bitmapFile = getPNGOutputMediaFile(filename);
+        if (bitmapFile == null) {
+            throw new NullPointerException("Error creating media file, check storage permissions!");
+        }
+        FileOutputStream fos = new FileOutputStream(bitmapFile);
+        image.compress(Bitmap.CompressFormat.PNG, 90, fos);
+        //image.compress(Bitmap.CompressFormat.JPEG,90,fos);
+        fos.flush();
+        fos.getFD().sync();
+        fos.close();
 
+        return bitmapFile;
+    }
     private File getOutputMediaFile(String filename) {
         // To be safe, you should check that the SDCard is mounted
         // using Environment.getExternalStorageState() before doing this.
@@ -134,6 +161,25 @@ public class screenshot {
         String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss_SSS").format(new Date());
         File mediaFile;
         String mImageName = filename + timeStamp + ".jpg";
+        mediaFile = new File(mediaStorageDirectory.getPath() + File.separator + mImageName);
+        return mediaFile;
+    }
+    private File getPNGOutputMediaFile(String filename) {
+        // To be safe, you should check that the SDCard is mounted
+        // using Environment.getExternalStorageState() before doing this.
+        File mediaStorageDirectory = new File(
+                Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS)
+                        + File.separator);
+        // Create the storage directory if it does not exist
+        if (!mediaStorageDirectory.exists()) {
+            if (!mediaStorageDirectory.mkdirs()) {
+                return null;
+            }
+        }
+        // Create a media file name
+        String timeStamp = new SimpleDateFormat("ddMMyyyy_HHmmss_SSS").format(new Date());
+        File mediaFile;
+        String mImageName = filename + timeStamp + ".png";
         mediaFile = new File(mediaStorageDirectory.getPath() + File.separator + mImageName);
         return mediaFile;
     }
