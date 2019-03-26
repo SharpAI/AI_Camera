@@ -404,7 +404,7 @@ public class Detection {
 
                     tsEnd = System.currentTimeMillis();
                     Log.v(TAG,"time diff (Save) "+(tsEnd-tsStart));
-                    Log.d(TAG,"Blurry value of face is "+blurryValue+"Saving face into "+faceFile.getAbsolutePath());
+                    Log.d(TAG,"Blurry value of face is "+blurryValue+", saving face into "+faceFile.getAbsolutePath());
 
                 } catch (Exception e) {
                     e.printStackTrace();
