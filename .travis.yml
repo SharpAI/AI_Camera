@@ -1,7 +1,15 @@
 language: android
 jdk: oraclejdk8
-dist: precise
+dist: trusty
 sudo: required
+jdk:
+  - oraclejdk8
+env:
+ global:
+  # These parameters should match the parameters for build tools and sdk versions in the gradle file
+   - ANDROID_BUILD_TOOLS=28.0.3 # should match gradle
+   - ADB_INSTALL_TIMEOUT=5 # minutes
+   - ANDROID_API=28 # api is same as gradle file
 android:
   components:
   - tools
@@ -11,6 +19,19 @@ android:
   - extra-google-google_play_services
   - extra-google-m2repository
   - extra-android-m2repository
+android:
+  components:
+    - tools
+    - platform-tools-$ANDROID_BUILD_TOOLS
+    - build-tools-$ANDROID_BUILD_TOOLS
+    - android-$ANDROID_API
+    - extra-google-m2repository
+    - extra-android-m2repository # for design library
+    - addon-google_apis-google-19 # google play services
+  licenses:
+    - android-sdk-preview-license-.+
+    - android-sdk-license-.+
+    - google-gdk-license-.+
 before_cache:
   - rm -f  $HOME/.gradle/caches/modules-2/modules-2.lock
   - rm -rf $HOME/.gradle/caches/*/plugin-resolution/
@@ -25,8 +46,5 @@ before_install:
   - unzip android-ndk-r17c-linux-x86_64.zip -d $HOME
   - export ANDROID_NDK_HOME=$HOME/android-ndk-r17c
   - export PATH=$PATH:$ANDROID_NDK_HOME
-  - mkdir "$ANDROID_HOME/licenses" || true		
-  - echo -e "\n8933bad161af4178b1185d1a37fbf41ea5269c55" > "$ANDROID_HOME/licenses/android-sdk-license"		
-  - echo -e "\n84831b9409646a918e30573bab4c9c91346d8abd" > "$ANDROID_HOME/licenses/android-sdk-preview-license"	
 before_script:
   - ./gradlew clean
