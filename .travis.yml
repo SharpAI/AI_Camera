@@ -12,21 +12,13 @@ env:
    - ANDROID_API=28 # api is same as gradle file
 android:
   components:
-  - tools
-  - platform-tools
-  - build-tools-27.0.3
-  - android-27
-  - extra-google-google_play_services
-  - extra-google-m2repository
-  - extra-android-m2repository
-android:
-  components:
     - tools
-    - platform-tools-$ANDROID_BUILD_TOOLS
+    - platform-tools
     - build-tools-$ANDROID_BUILD_TOOLS
     - android-$ANDROID_API
     - extra-google-m2repository
     - extra-android-m2repository # for design library
+    - extra-google-google_play_services
     - addon-google_apis-google-19 # google play services
   licenses:
     - android-sdk-preview-license-.+
