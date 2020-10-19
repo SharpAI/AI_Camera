@@ -1,3 +1,5 @@
+gradle-build
+app/release
 # Built application files
 .idea/
 *.apk
@@ -79,3 +81,5 @@ lint/generated/
 lint/outputs/
 lint/tmp/
 # lint/reports/
+#
+*/.cxx/
