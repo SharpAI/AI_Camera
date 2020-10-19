@@ -39,4 +39,5 @@ before_install:
   - export ANDROID_NDK_HOME=$HOME/android-ndk-r17c
   - export PATH=$PATH:$ANDROID_NDK_HOME
 before_script:
+  - touch local.properties
   - ./gradlew clean
