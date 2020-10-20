@@ -12,6 +12,8 @@ env:
    - ANDROID_API=28 # api is same as gradle file
    - CC=clang
    - CXX=clang++
+   - CMAKE_C_COMPILER=clang
+   - CMAKE_CXX_COMPILER=clang++
 android:
   components:
     - tools
