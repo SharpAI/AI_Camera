@@ -13,6 +13,7 @@ buildscript {
         // in the individual module build.gradle files
     }
 }
+android.ndkVersion "16.1.4479499"
 
 allprojects {
     repositories {
