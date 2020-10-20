@@ -10,6 +10,8 @@ env:
    - ANDROID_BUILD_TOOLS=28.0.3 # should match gradle
    - ADB_INSTALL_TIMEOUT=5 # minutes
    - ANDROID_API=28 # api is same as gradle file
+   - CC=clang
+   - CXX=clang++
 android:
   components:
     - tools
@@ -38,6 +40,10 @@ before_install:
   - unzip android-ndk-r17c-linux-x86_64.zip -d $HOME
   - export ANDROID_NDK_HOME=$HOME/android-ndk-r17c
   - export PATH=$PATH:$ANDROID_NDK_HOME
+install:
+  - echo y | sdkmanager 'ndk-bundle'
+  - echo y | sdkmanager 'cmake;3.6.4111459'
+  - echo y | sdkmanager 'lldb;3.0'
 before_script:
   - touch local.properties
   - ./gradlew clean
