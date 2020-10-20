@@ -1,19 +1,17 @@
 language: android
-jdk: oraclejdk8
-dist: trusty
-sudo: required
 jdk:
   - oraclejdk8
+dist: trusty
+sudo: required
 env:
- global:
-  # These parameters should match the parameters for build tools and sdk versions in the gradle file
-   - ANDROID_BUILD_TOOLS=28.0.3 # should match gradle
-   - ADB_INSTALL_TIMEOUT=5 # minutes
-   - ANDROID_API=28 # api is same as gradle file
-   - CC=clang
-   - CXX=clang++
-   - CMAKE_C_COMPILER=clang
-   - CMAKE_CXX_COMPILER=clang++
+  global:
+    - ANDROID_BUILD_TOOLS=28.0.3
+    - ADB_INSTALL_TIMEOUT=5
+    - ANDROID_API=28
+    - CC=clang
+    - CXX=clang++
+    - CMAKE_C_COMPILER=clang
+    - CMAKE_CXX_COMPILER=clang++
 android:
   components:
     - tools
@@ -21,9 +19,9 @@ android:
     - build-tools-$ANDROID_BUILD_TOOLS
     - android-$ANDROID_API
     - extra-google-m2repository
-    - extra-android-m2repository # for design library
+    - extra-android-m2repository
     - extra-google-google_play_services
-    - addon-google_apis-google-19 # google play services
+    - addon-google_apis-google-19
   licenses:
     - android-sdk-preview-license-.+
     - android-sdk-license-.+
@@ -37,14 +35,21 @@ cache:
   - "$HOME/.gradle/wrapper/"
   - "$HOME/.android/build-cache"
 before_install:
+  - openssl aes-256-cbc -K $encrypted_0fc01839c44e_key -iv $encrypted_0fc01839c44e_iv -in keystore.enc -out keystore -d
   - sudo chmod +x gradlew
-  - wget https://dl.google.com/android/repository/android-ndk-r10e-linux-x86_64.zip
-  - unzip android-ndk-r10e-linux-x86_64 -d $HOME > unzip.log
-  - export ANDROID_NDK_HOME=$HOME/android-ndk-r10e
-  - export PATH=$PATH:$ANDROID_NDK_HOME
 install:
-  #- echo y | sdkmanager 'ndk-bundle'
+  - echo y | sdkmanager 'ndk;16.1.4479499'
   - echo y | sdkmanager 'cmake;3.6.4111459'
 before_script:
   - touch local.properties
-  - ./gradlew clean
+  - "./gradlew clean"
+script:
+  - ./gradlew assembleRelease
+deploy:
+  - provider: releases
+    api_key: $GITHUB_API_TOKEN
+    file: app/build/outputs/apk/release/*
+    file_glob: true
+    skip_cleanup: true
+    on:
+        tags: true
