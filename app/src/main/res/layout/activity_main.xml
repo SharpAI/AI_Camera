@@ -15,7 +15,26 @@
         android:layout_alignParentTop="true"
         android:layout_width="75dp"
         android:layout_height="75dp"
-        android:layout_marginLeft="30dp"
-        android:layout_marginTop="30dp"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="10dp"
         android:src="@drawable/border" />
+    <ImageView
+        android:id="@+id/detected_face_view"
+        android:layout_width="75dp"
+        android:layout_height="75dp"
+        android:background="@color/control_background"
+        app:srcCompat="@color/control_background"
+        android:layout_marginLeft="10dp"
+        android:layout_marginTop="95dp"
+        android:contentDescription="TODO" />
+
+    <ImageView
+        android:id="@+id/detected_person_view"
+        android:layout_marginLeft="95dp"
+        android:layout_marginTop="10dp"
+        android:layout_width="100dp"
+        android:layout_height="200dp"
+        android:background="@color/control_background"
+        app:srcCompat="@color/control_background"
+        android:contentDescription="TODO" />
 </RelativeLayout>

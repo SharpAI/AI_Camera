@@ -14,13 +14,13 @@ import android.os.Environment;
 import android.util.Log;
 import android.view.SurfaceHolder;
 import android.view.SurfaceView;
+import android.widget.ImageView;
 
-import org.sharpai.aicamera.env.ImageUtils;
+import org.sharpai.lib.Detection;
 
 import java.io.IOException;
 import java.nio.ByteBuffer;
 
-import tv.danmaku.ijk.media.example.widget.media.Detection;
 
 /** A basic Camera preview class */
 public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback {
@@ -38,12 +38,17 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private static final int PREVIEW_HEIGHT = 1080;
 
     private Detection mDetection;
+    private ImageView mPersonView;
+    private ImageView mFaceView;
 
-    public CameraPreview(Context context, Camera camera, Camera.CameraInfo cameraInfo) {
+    public CameraPreview(Context context, Camera camera, Camera.CameraInfo cameraInfo,
+                         ImageView personView,ImageView faceView) {
         super(context);
         mCamera = camera;
         mCameraInfo = cameraInfo;
         mContext = context;
+        mPersonView = personView;
+        mFaceView = faceView;
 
         // Install a SurfaceHolder.Callback so we get notified when the
         // underlying surface is created and destroyed.
@@ -54,7 +59,8 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
 
         mPreviewCallback = new PreviewCallback();
         // mLibyuvCore = new LibyuvCore();
-        mDetection = new Detection(context);
+
+        mDetection = new Detection(mContext,mPersonView,mFaceView);
     }
 
     private void adjustCameraOrientation() {

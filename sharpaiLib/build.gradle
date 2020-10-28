@@ -1,0 +1,103 @@
+apply plugin: 'com.android.library'
+
+android {
+
+    lintOptions {
+        abortOnError false
+    }
+    defaultConfig {
+        minSdkVersion 21
+        compileSdkVersion 28
+        renderscriptTargetApi 16
+        renderscriptSupportModeEnabled true
+        ndk {
+            abiFilters 'armeabi-v7a', 'arm64-v8a'//, 'arm64-v8a' //,'x86', 'x86_64', 'armeabi', 'arm64-v8a'
+            stl "gnustl_static"
+        }
+        externalNativeBuild {
+            cmake {
+                arguments "-DANDROID_TOOLCHAIN=clang"
+                cFlags "-fopenmp -O2 -fvisibility=hidden -fomit-frame-pointer -fstrict-aliasing -ffunction-sections -fdata-sections -ffast-math "
+                cppFlags "-fopenmp -O2 -fvisibility=hidden -fvisibility-inlines-hidden -fomit-frame-pointer -fstrict-aliasing -ffunction-sections -fdata-sections -ffast-math "
+                cppFlags ""
+                cppFlags "-std=c++11"
+                cppFlags "-frtti"
+                cppFlags "-fexceptions"
+            }
+        }
+    }
+
+    buildTypes {
+        release {
+            minifyEnabled false
+            proguardFiles getDefaultProguardFile('proguard-android.txt'), 'proguard-rules.pro'
+        }
+    }
+    externalNativeBuild {
+        cmake {
+            path "CMakeLists.txt"
+        }
+    }
+    aaptOptions {
+        noCompress "tflite"
+    }
+    compileOptions {
+        sourceCompatibility JavaVersion.VERSION_1_8
+        targetCompatibility JavaVersion.VERSION_1_8
+    }
+    //productFlavors {
+    //    all32Compile { minSdkVersion 21 }
+    //    all64Compile { minSdkVersion 21 }
+        // armv5 {}
+        // armv7a {}
+        // arm64 { minSdkVersion 21 }
+        // x86 {}
+    //}
+    sourceSets {
+        main {
+            jniLibs.srcDirs=['libs']
+        }
+    }
+    compileSdkVersion = 28
+    buildToolsVersion = '28.0.3'
+}
+repositories {
+    flatDir {
+        dirs 'libs'
+    }
+    maven {
+        url 'https://google.bintray.com/tensorflow'
+    }
+    maven {
+        url 'https://jitpack.io'
+    }
+}
+dependencies {
+    implementation fileTree(include: ['*.jar'], dir: 'libs')
+    //implementation 'com.android.support:appcompat-v7:27.1.1'
+    //implementation 'com.android.support:preference-v7:27.1.1'
+    //implementation 'com.android.support:support-annotations:27.1.1'
+    implementation 'org.tensorflow:tensorflow-lite:0.0.0-gpu-experimental'
+    //implementation 'nl.bravobit:android-ffmpeg:1.1.5'
+    //implementation 'com.arthenica:mobile-ffmpeg-full-gpl:3.1'
+    //implementation 'com.zolad:videoslimmer:1.0.0'
+
+    //implementation 'com.squareup:otto:1.3.8'
+
+    //implementation project(':ijkplayer-java')
+    //implementation project(':ijkplayer-exo')
+
+    implementation project(':easyrs')
+    implementation project(':rembrandtAndroid')
+    implementation project(':magicfilter')
+    implementation project(':openCVLibrary341')
+    implementation project(':nativeLib')
+    implementation project(':dlib')
+    implementation project(':libFaceDetection')
+    //implementation project(':OpenCV3.1')
+    //implementation project(':mp4compose')
+
+    //implementation project(':ijkplayer-armv5')
+    //implementation project(':ijkplayer-armv7a')
+    //implementation project(':ijkplayer-arm64')
+}
