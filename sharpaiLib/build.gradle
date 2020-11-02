@@ -87,6 +87,9 @@ dependencies {
     //implementation project(':ijkplayer-java')
     //implementation project(':ijkplayer-exo')
 
+    implementation 'com.amazonaws:aws-android-sdk-core:2.19.1'
+    implementation 'com.amazonaws:aws-android-sdk-s3:2.19.1'
+
     implementation project(':easyrs')
     implementation project(':rembrandtAndroid')
     implementation project(':magicfilter')

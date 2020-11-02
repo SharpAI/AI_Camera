@@ -105,9 +105,14 @@
     <orderEntry type="jdk" jdkName="Android API 28 Platform" jdkType="Android SDK" />
     <orderEntry type="sourceFolder" forTests="false" />
     <orderEntry type="library" name="Gradle: __local_aars__:/home/simba/Android/Sdk/build-tools/28.0.3/renderscript/lib/renderscript-v8.jar:unspecified@jar" level="project" />
+    <orderEntry type="library" name="Gradle: com.google.code.gson:gson:2.8.6@jar" level="project" />
+    <orderEntry type="library" name="Gradle: androidx.annotation:annotation:1.1.0@jar" level="project" />
     <orderEntry type="library" name="Gradle: com.jakewharton.hugo:hugo-annotations:1.2.1@jar" level="project" />
     <orderEntry type="library" name="Gradle: org.aspectj:aspectjrt:1.8.5@jar" level="project" />
     <orderEntry type="library" name="Gradle: org.tensorflow:tensorflow-lite:0.0.0-gpu-experimental@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.amazonaws:aws-android-sdk-s3:2.19.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.amazonaws:aws-android-sdk-kms:2.19.1@aar" level="project" />
+    <orderEntry type="library" name="Gradle: com.amazonaws:aws-android-sdk-core:2.19.1@aar" level="project" />
     <orderEntry type="library" name="Gradle: com.jakewharton.hugo:hugo-runtime:1.2.1@aar" level="project" />
     <orderEntry type="module" module-name="dlib" />
     <orderEntry type="module" module-name="easyrs" />

@@ -126,6 +126,7 @@ public class Detection {
 
 
     private PoseEstimator mPoseEstimator;
+    private Uploader mUploader=null;
 
     static {
         if (OpenCVLoader.initDebug()) {
@@ -148,6 +149,7 @@ public class Detection {
         mLastCleanPicsTimestamp = System.currentTimeMillis();
 
         initDetectionContext();
+        mUploader = new Uploader();
     }
     /**
      * Initializes the UI and initiates the creation of a motion detector.
@@ -511,10 +513,12 @@ public class Detection {
         File file = null;
         JSONArray detectInfo = new JSONArray();
         String wholeFilename = null;
+        String wholeImageUrl = "";
+        File wholeFile = null;
 
         if(SEND_WITH_FACE_JSON_MESSAGE_TO_DEEPCAMERA == true){
             Bitmap wholeImgForGif = mMotionDetection.resizeBmp(bmp,WHOLE_IMAGE_FOR_GIF_WIDTH,WHOLE_IMAGE_FOR_GIF_HEIGHT);
-            File wholeFile = screenshot.getInstance()
+            wholeFile = screenshot.getInstance()
                 .saveScreenshotToPicturesFolder(mContext, wholeImgForGif, "gif_frame_");
             wholeFilename = wholeFile.getAbsolutePath();
         }
@@ -549,6 +553,7 @@ public class Detection {
 
             if(SEND_WITH_FACE_JSON_MESSAGE_TO_DEEPCAMERA){
                 personInfo.put("wholeImagePath",wholeFilename);
+                wholeImageUrl = mUploader.putObject(wholeFile.getName(),wholeFilename);
             }
 
             personInfo.put("personWidth",rectf.width());
@@ -559,8 +564,11 @@ public class Detection {
                     .saveScreenshotToPicturesFolder(mContext, personBmp, "person_");
             filename = file.getAbsolutePath();
             personInfo.put("personImagePath",filename);
+            String personImageUrl = mUploader.putObject(file.getName(),file.getAbsolutePath());
+            personInfo.put("personImageUrl",personImageUrl);
             //personInfo.put("personPose",mPoseEstimator.pointList);
 
+            file.delete();
             int num = 0;
             if(face_info != null && face_info.length > 0){
                 num = face_info[0];
@@ -639,6 +647,9 @@ public class Detection {
                 personInfo.put("faceStyle",faceStyle);
                 personInfo.put("faceBlurry",blurryValue);
 
+                String faceImageUrl = mUploader.putObject(faceFile.getName(),faceFile.getAbsolutePath());
+                personInfo.put("faceImageUrl",faceImageUrl);
+                faceFile.delete();
                 //bitmap.recycle();
                 //bitmap = null;
             } else if(SEND_WITH_FACE_JSON_MESSAGE_TO_DEEPCAMERA == false) {
@@ -664,6 +675,7 @@ public class Detection {
             finalObject.put("deviceName", "camera_1");
             finalObject.put("motion", true);
             finalObject.put("wholeImagePath", wholeFilename);
+            finalObject.put("wholeImageUrl", wholeImageUrl);
 
             Log.d(TAG,"Detection information: "+finalObject);
 
@@ -671,6 +683,7 @@ public class Detection {
                 mBackgroundHandler.obtainMessage(PROCESS_JSON_ARRAY_MSG, finalObject).sendToTarget();
             }
         }
+        wholeFile.delete();
 
         //VideoActivity.setNumberOfFaces(face_num);
         return face_num;
@@ -678,6 +691,7 @@ public class Detection {
     public void doSendDummyTask(Bitmap bmp){
         JSONArray detectInfo = new JSONArray();
         String wholeFilename;
+        String wholeImageUrl="";
 
         if(SEND_WITH_FACE_JSON_MESSAGE_TO_DEEPCAMERA == true){
             Bitmap wholeImgForGif = mMotionDetection.resizeBmp(bmp,WHOLE_IMAGE_FOR_GIF_WIDTH,WHOLE_IMAGE_FOR_GIF_HEIGHT);
@@ -695,6 +709,8 @@ public class Detection {
                 finalObject.put("deviceName", "camera_1");
                 finalObject.put("motion", true);
                 finalObject.put("wholeImagePath", wholeFilename);
+                wholeImageUrl = mUploader.putObject(wholeFile.getName(),wholeFilename);
+                finalObject.put("wholeImageUrl", wholeImageUrl);
             } catch (JSONException e) {
                 e.printStackTrace();
             }
@@ -703,6 +719,7 @@ public class Detection {
             if(CONNECT_TO_LOCAL_SERVER == true){
                 mBackgroundHandler.obtainMessage(PROCESS_JSON_ARRAY_MSG, finalObject).sendToTarget();
             }
+            wholeFile.delete();
         } else {
             if(CONNECT_TO_LOCAL_SERVER == true){
                 mBackgroundHandler.obtainMessage(PROCESS_KEEP_ALIVE_MSG).sendToTarget();
@@ -714,7 +731,7 @@ public class Detection {
     private void checkIfNeedSendDummyTask(Bitmap bmp){
 
         long tm = System.currentTimeMillis();
-        if (tm - mLastTaskSentTimestamp > 1*1000) {
+        if (tm - mLastTaskSentTimestamp > 60*1000) {
             mLastTaskSentTimestamp = System.currentTimeMillis();
             doSendDummyTask(bmp);
             Log.d(TAG,"To send dummy task to keep alive for client status");
