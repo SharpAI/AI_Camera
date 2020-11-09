@@ -16,8 +16,7 @@ import java.io.File;
 
 public class Uploader {
     AmazonS3Client mClient = null;
-    //private String mEndpoint = "http://165.232.62.29:9000";
-    private String mEndpoint = "http://192.168.1.5:9000";
+    private String mEndpoint = "http://165.232.62.29:9000";
     private String mBucket = "faces";
     private String mUrlPrefix= mEndpoint + "/" +mBucket;
     private boolean mIfcheckedBucket = false;

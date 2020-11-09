@@ -50,6 +50,7 @@ import java.io.InputStreamReader;
 import java.io.OutputStream;
 import java.io.OutputStreamWriter;
 import java.io.UnsupportedEncodingException;
+import java.net.ConnectException;
 import java.net.HttpURLConnection;
 import java.net.URL;
 import java.text.SimpleDateFormat;
@@ -112,7 +113,7 @@ public class Detection {
 
     private static final boolean SEND_WITH_FACE_JSON_MESSAGE_TO_DEEPCAMERA = true;
 
-    private static final boolean CONNECT_TO_LOCAL_SERVER = false;
+    private static final boolean CONNECT_TO_LOCAL_SERVER = true;
 
     private FaceDet mFaceDet;
 
@@ -206,8 +207,7 @@ public class Detection {
                     Log.d(TAG, "Processing file: " + msg.obj);
                     file = new File(msg.obj.toString());
                     try {
-                        url = new URL("http://127.0.0.1:" + 3000 + "/api/post?url=" + msg.obj);
-
+                        url = new URL("http://165.232.62.29:" + 3000 + "/api/post?url=" + msg.obj);
                         urlConnection = (HttpURLConnection) url
                                 .openConnection();
 
@@ -233,7 +233,8 @@ public class Detection {
                     Log.d(TAG, "Processing message: " + msg.obj);
                     //String jsonString = (String) msg.obj;
                     JSONObject json = (JSONObject) msg.obj;
-                    String response = makeRequest("http://127.0.0.1:3000/post2",json.toString());
+                    String response = makeRequest("http://165.232.62.29:3030/post2",json.toString());
+
                     if(response == null){
                         Log.d(TAG,"Error of rest post");
                     } else {
@@ -308,6 +309,9 @@ public class Detection {
             e.printStackTrace();
         } catch (IOException e) {
             e.printStackTrace();
+        }
+        if(result != null){
+            Log.d(TAG,"Result of REST request: "+result.toString());
         }
         return result;
     }
