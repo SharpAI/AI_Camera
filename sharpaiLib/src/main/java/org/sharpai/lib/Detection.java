@@ -103,6 +103,10 @@ public class Detection {
     private int PREVIEW_IMAGE_WIDTH = 1920;
     private int PREVIEW_IMAGE_HEIGHT = 1080;
 
+    // private String 165.232.62.29;
+    private String SERVER_IP_ADDRESS = "10.168.1.221";
+    private String SERVER_IP_PORT = "3030";
+
     private static final int WHOLE_IMAGE_FOR_GIF_WIDTH = 427;
     private static final int WHOLE_IMAGE_FOR_GIF_HEIGHT = 240;
 
@@ -136,11 +140,16 @@ public class Detection {
             Log.i(TAG, "OpenCV initialize failed");
         }
     }
-    public Detection(Context context, ImageView detectedPersonView , ImageView detectedFaceView){
+    public Detection(Context context, ImageView detectedPersonView , ImageView detectedFaceView,
+                String savedAPIServerIP, String savedAPIServerPort, String savedMinioIP,
+                     String savedMinioPort){
 
         mContext = context;
         mPersonView = detectedPersonView;
         mFaceView = detectedFaceView;
+
+        SERVER_IP_ADDRESS = savedAPIServerIP;
+        SERVER_IP_PORT = savedAPIServerPort;
 
         HandlerThread handlerThread = new HandlerThread("BackgroundThread");
         handlerThread.start();
@@ -150,7 +159,7 @@ public class Detection {
         mLastCleanPicsTimestamp = System.currentTimeMillis();
 
         initDetectionContext();
-        mUploader = new Uploader();
+        mUploader = new Uploader(savedMinioIP,savedMinioPort);
     }
     /**
      * Initializes the UI and initiates the creation of a motion detector.
@@ -207,7 +216,8 @@ public class Detection {
                     Log.d(TAG, "Processing file: " + msg.obj);
                     file = new File(msg.obj.toString());
                     try {
-                        url = new URL("http://165.232.62.29:" + 3000 + "/api/post?url=" + msg.obj);
+                        //url = new URL("http://165.232.62.29:" + 3030 + "/api/post?url=" + msg.obj);
+                        url = new URL("http://"+SERVER_IP_ADDRESS+":" + SERVER_IP_PORT + "/api/post?url=" + msg.obj);
                         urlConnection = (HttpURLConnection) url
                                 .openConnection();
 
@@ -233,7 +243,7 @@ public class Detection {
                     Log.d(TAG, "Processing message: " + msg.obj);
                     //String jsonString = (String) msg.obj;
                     JSONObject json = (JSONObject) msg.obj;
-                    String response = makeRequest("http://165.232.62.29:3030/post2",json.toString());
+                    String response = makeRequest("http://"+SERVER_IP_ADDRESS+":" + SERVER_IP_PORT+"/post2",json.toString());
 
                     if(response == null){
                         Log.d(TAG,"Error of rest post");

@@ -18,4 +18,14 @@
     <string name="request_permission">This sample needs camera permission.</string>
     <string name="camera_error">This device doesn\'t support Camera2 API.</string>
     <string name="adjust_text">Please adjust the position</string>
+    <string name="default_api_server_ip">10.168.1.221</string>
+    <string name="saved_api_server_ip">saved_api_server_ip</string>
+    <string name="default_minio_server_ip">10.168.1.221</string>
+    <string name="saved_minio_server_ip">saved_minio_server_ip</string>
+
+    <string name="default_api_server_port">3030</string>
+    <string name="saved_api_server_port">saved_api_server_port</string>
+    <string name="default_minio_server_port">9000</string>
+    <string name="saved_minio_server_port">saved_minio_server_port</string>
+    <string name="title_activity_setup">Setup</string>
 </resources>

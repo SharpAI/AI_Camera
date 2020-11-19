@@ -37,4 +37,15 @@
         android:background="@color/control_background"
         app:srcCompat="@color/control_background"
         android:contentDescription="TODO" />
+
+    <TextView
+        android:id="@+id/serverAddress"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        android:layout_marginLeft="95dp"
+        android:layout_marginTop="230dp"
+        android:background="#4F000000"
+        android:text="@string/default_api_server_ip"
+        android:textColor="#F8F7F7" />
+
 </RelativeLayout>

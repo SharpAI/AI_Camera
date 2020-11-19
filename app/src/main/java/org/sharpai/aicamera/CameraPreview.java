@@ -42,7 +42,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
     private ImageView mFaceView;
 
     public CameraPreview(Context context, Camera camera, Camera.CameraInfo cameraInfo,
-                         ImageView personView,ImageView faceView) {
+                         ImageView personView,ImageView faceView,
+                         String savedAPIServerIP,
+                         String savedAPIServerPort,
+                         String savedMinioIP,
+                         String savedMinioPort) {
         super(context);
         mCamera = camera;
         mCameraInfo = cameraInfo;
@@ -60,7 +64,11 @@ public class CameraPreview extends SurfaceView implements SurfaceHolder.Callback
         mPreviewCallback = new PreviewCallback();
         // mLibyuvCore = new LibyuvCore();
 
-        mDetection = new Detection(mContext,mPersonView,mFaceView);
+        mDetection = new Detection(mContext,mPersonView,mFaceView,
+                savedAPIServerIP,
+                savedAPIServerPort,
+                savedMinioIP,
+                savedMinioPort);
     }
 
     private void adjustCameraOrientation() {

@@ -2,7 +2,9 @@ package org.sharpai.aicamera;
 
 import android.Manifest;
 import android.app.Activity;
+import android.app.AlertDialog;
 import android.content.Context;
+import android.content.SharedPreferences;
 import android.content.pm.PackageManager;
 import android.graphics.Bitmap;
 import android.hardware.Camera;
@@ -16,10 +18,14 @@ import android.os.StrictMode;
 import android.provider.Settings;
 import android.view.Gravity;
 import android.view.LayoutInflater;
+import android.view.View;
 import android.view.WindowManager;
+import android.widget.Button;
 import android.widget.FrameLayout;
+import android.widget.ImageButton;
 import android.widget.ImageView;
 import android.widget.PopupWindow;
+import android.widget.TextView;
 import android.widget.Toast;
 
 import com.google.zxing.BarcodeFormat;
@@ -37,7 +43,7 @@ import static android.graphics.Color.WHITE;
 /**
  * Created by jerikc on 15/10/6.
  */
-public class MainActivity extends Activity {
+public class MainActivity extends Activity{
 
     private static final String TAG = "MainActivity";
 
@@ -164,13 +170,32 @@ public class MainActivity extends Activity {
         return UDID.toLowerCase();
     }
     private void setFragment(){
+
+        SharedPreferences sharedPref = this.getSharedPreferences("SHARE_AI_CAMERA_PREF",Context.MODE_PRIVATE);
+        String textViewDisplayString = "";
+
+        String defaultServerIP = getResources().getString(R.string.default_api_server_ip);
+        String defaultMinioIP = getResources().getString(R.string.default_minio_server_ip);
+        String defaultServerPort = getResources().getString(R.string.default_api_server_port);
+        String defaultMinioPort = getResources().getString(R.string.default_minio_server_port);
+
+        String savedAPIServerIP = sharedPref.getString(getString(R.string.saved_api_server_ip), defaultServerIP);
+        String savedMinioIP = sharedPref.getString(getString(R.string.saved_minio_server_ip), defaultMinioIP);
+
+        String savedAPIServerPort = sharedPref.getString(getString(R.string.saved_api_server_port), defaultServerPort);
+        String savedMinioPort = sharedPref.getString(getString(R.string.saved_minio_server_port), defaultMinioPort);
+
         // Create an instance of Camera
         mCamera = getCameraInstance();
 
         ImageView detectedPersonView =  findViewById(R.id.detected_person_view);
         ImageView detectedFaceView =  findViewById(R.id.detected_face_view);
         // Create our Preview view and set it as the content of our activity.
-        mPreview = new CameraPreview(this, mCamera, mCameraInfo,detectedPersonView,detectedFaceView);
+        mPreview = new CameraPreview(this, mCamera, mCameraInfo,detectedPersonView,detectedFaceView,
+                savedAPIServerIP,
+                savedAPIServerPort,
+                savedMinioIP,
+                savedMinioPort);
         FrameLayout preview = (FrameLayout) findViewById(R.id.camera_preview);
         preview.addView(mPreview);
 
@@ -186,8 +211,16 @@ public class MainActivity extends Activity {
         } catch (WriterException e) {
             e.printStackTrace();
         }
-    }
+        TextView serverAddressView =  findViewById(R.id.serverAddress);
+        textViewDisplayString = textViewDisplayString + "API Server";
+        textViewDisplayString = textViewDisplayString + "\nAddress:\t"+savedAPIServerIP;
+        textViewDisplayString = textViewDisplayString + "\nPort:\t\t\t"+savedAPIServerPort;
+        textViewDisplayString = textViewDisplayString + "\nMinio Server";
+        textViewDisplayString = textViewDisplayString + "\nAddress:\t"+savedMinioIP;
+        textViewDisplayString = textViewDisplayString + "\nPort:\t\t\t"+savedMinioPort;
+        serverAddressView.setText(textViewDisplayString);
 
+    }
     Bitmap encodeAsBitmap(String str,int width,int height) throws WriterException {
         BitMatrix result;
         try {

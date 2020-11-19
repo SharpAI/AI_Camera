@@ -18,4 +18,5 @@
 <resources>
     <string name="app_name">AI Camera</string>
     <string name="activity_name_detection">AI Camera</string>
+    <string name="activity_name_setup">Setup AI Camera</string>
 </resources>
